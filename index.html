@@ -422,58 +422,58 @@
          </div>
 
          <!-- Welcome Popup -->
-         <div id="welcomeModal" class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50">
-             <div class="glass-dark rounded-3xl p-12 max-w-2xl mx-4">
+         <div id="welcomeModal" class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+             <div class="glass-dark rounded-3xl p-6 sm:p-8 md:p-12 max-w-2xl w-full mx-auto max-h-[90vh] overflow-y-auto">
                  <div class="text-center">
-                     <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
-                         <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 md:mb-8 shadow-2xl">
+                         <svg class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                          </svg>
                      </div>
-                     <h2 class="text-4xl font-bold text-white mb-6 text-glow">Welcome to Form Builder Pro!</h2>
-                     <p class="text-xl text-white/90 mb-8 leading-relaxed">The hassle-free Google Form creator powered by AI</p>
+                     <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6 text-glow">Welcome to Form Builder Pro!</h2>
+                     <p class="text-base sm:text-lg md:text-xl text-white/90 mb-6 sm:mb-8 leading-relaxed">The hassle-free Google Form creator powered by AI</p>
                      
-                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                         <div class="bg-white/10 rounded-2xl p-6 border border-white/20">
-                             <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                 <span class="text-white font-bold text-lg">1</span>
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                         <div class="bg-white/10 rounded-2xl p-4 sm:p-6 border border-white/20">
+                             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                                 <span class="text-white font-bold text-base sm:text-lg">1</span>
                              </div>
-                             <h3 class="text-white font-bold text-lg mb-2">Input Heading</h3>
-                             <p class="text-white/80 text-sm">Just enter your form title and let AI do the work</p>
+                             <h3 class="text-white font-bold text-base sm:text-lg mb-2">Input Heading</h3>
+                             <p class="text-white/80 text-xs sm:text-sm">Just enter your form title and let AI do the work</p>
                          </div>
-                         <div class="bg-white/10 rounded-2xl p-6 border border-white/20">
-                             <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                 <span class="text-white font-bold text-lg">2</span>
+                         <div class="bg-white/10 rounded-2xl p-4 sm:p-6 border border-white/20">
+                             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                                 <span class="text-white font-bold text-base sm:text-lg">2</span>
                              </div>
-                             <h3 class="text-white font-bold text-lg mb-2">AI Generates</h3>
-                             <p class="text-white/80 text-sm">AI creates relevant questions with smart options</p>
+                             <h3 class="text-white font-bold text-base sm:text-lg mb-2">AI Generates</h3>
+                             <p class="text-white/80 text-xs sm:text-sm">AI creates relevant questions with smart options</p>
                          </div>
-                         <div class="bg-white/10 rounded-2xl p-6 border border-white/20">
-                             <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                 <span class="text-white font-bold text-lg">3</span>
+                         <div class="bg-white/10 rounded-2xl p-4 sm:p-6 border border-white/20">
+                             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                                 <span class="text-white font-bold text-base sm:text-lg">3</span>
                              </div>
-                             <h3 class="text-white font-bold text-lg mb-2">Review & Create</h3>
-                             <p class="text-white/80 text-sm">Review, edit if needed, and create instantly</p>
+                             <h3 class="text-white font-bold text-base sm:text-lg mb-2">Review & Create</h3>
+                             <p class="text-white/80 text-xs sm:text-sm">Review, edit if needed, and create instantly</p>
                          </div>
                      </div>
                      
-                     <div class="bg-yellow-500/20 border border-yellow-500/30 rounded-2xl p-4 mb-6">
-                         <div class="flex items-start space-x-3">
-                             <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <div class="bg-yellow-500/20 border border-yellow-500/30 rounded-2xl p-3 sm:p-4 mb-4 sm:mb-6">
+                         <div class="flex items-start space-x-2 sm:space-x-3">
+                             <div class="w-5 h-5 sm:w-6 sm:h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                 <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                                  </svg>
                              </div>
                              <div>
-                                 <h4 class="text-yellow-300 font-semibold text-sm mb-1">💡 Pro Tip</h4>
-                                 <p class="text-yellow-200/90 text-sm">If you encounter any errors or bugs, simply try again without reloading the page. The AI will generate fresh content each time!</p>
+                                 <h4 class="text-yellow-300 font-semibold text-xs sm:text-sm mb-1">💡 Pro Tip</h4>
+                                 <p class="text-yellow-200/90 text-xs sm:text-sm">If you encounter any errors or bugs, simply try again without reloading the page. The AI will generate fresh content each time!</p>
                              </div>
                          </div>
                      </div>
                      
-                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                         <button onclick="closeWelcomeModal()" class="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all btn-glow font-bold text-lg shadow-lg">🚀 Get Started</button>
-                         <button onclick="showTutorial()" class="px-8 py-4 bg-white/20 text-white rounded-2xl hover:bg-white/30 transition-all font-bold text-lg">📖 How It Works</button>
+                     <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                         <button onclick="closeWelcomeModal()" class="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all btn-glow font-bold text-base sm:text-lg shadow-lg">🚀 Get Started</button>
+                         <button onclick="showTutorial()" class="px-6 sm:px-8 py-3 sm:py-4 bg-white/20 text-white rounded-2xl hover:bg-white/30 transition-all font-bold text-base sm:text-lg">📖 How It Works</button>
                      </div>
                  </div>
              </div>
