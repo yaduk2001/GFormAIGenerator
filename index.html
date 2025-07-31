@@ -145,6 +145,70 @@
              .container { padding: 1rem; }
              .text-5xl { font-size: 2.5rem; }
              .text-2xl { font-size: 1.5rem; }
+             
+             /* Mobile-specific optimizations */
+             .glass { 
+                 backdrop-filter: blur(15px) saturate(150%);
+                 background: rgba(255, 255, 255, 0.15);
+                 border: 1px solid rgba(255, 255, 255, 0.25);
+             }
+             
+             /* Larger touch targets */
+             button, input, select, textarea {
+                 min-height: 44px;
+                 font-size: 16px !important; /* Prevents zoom on iOS */
+             }
+             
+                      /* Mobile-friendly spacing */
+         .mb-8 { margin-bottom: 1.5rem; }
+         .p-8 { padding: 1.5rem; }
+         .px-6 { padding-left: 1rem; padding-right: 1rem; }
+         .py-4 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+         
+         /* Touch-friendly interactions */
+         button, input, select, textarea {
+             -webkit-tap-highlight-color: transparent;
+             touch-action: manipulation;
+         }
+         
+         /* Prevent text selection on buttons */
+         button {
+             -webkit-user-select: none;
+             -moz-user-select: none;
+             -ms-user-select: none;
+             user-select: none;
+         }
+             
+             /* Stack buttons vertically on mobile */
+             .flex.space-x-4 {
+                 flex-direction: column;
+                 gap: 0.75rem;
+             }
+             
+             /* Mobile modal adjustments */
+             .glass-dark {
+                 margin: 1rem;
+                 padding: 1.5rem;
+                 max-width: calc(100vw - 2rem);
+             }
+         }
+         
+         /* Extra small devices */
+         @media (max-width: 480px) {
+             .text-5xl { font-size: 2rem; }
+             .text-4xl { font-size: 1.75rem; }
+             .text-3xl { font-size: 1.5rem; }
+             
+             .container { padding: 0.5rem; }
+             
+             /* Compact mobile layout */
+             .p-8 { padding: 1rem; }
+             .mb-8 { margin-bottom: 1rem; }
+             
+             /* Single column grid on very small screens */
+             .grid.grid-cols-1.md\\:grid-cols-3 {
+                 grid-template-columns: 1fr;
+             }
          }
          
          /* Fix scrolling issues */
@@ -153,6 +217,7 @@
              overflow-y: auto;
              scroll-behavior: smooth;
              min-height: 100vh;
+             -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
          }
          
          html {
@@ -267,10 +332,10 @@
                         </div>
                         
                         <div id="aiOptions" class="hidden">
-                            <div class="flex space-x-4">
-                                <input type="number" id="numOptions" value="4" min="2" max="10" class="flex-1 px-6 py-4 rounded-2xl bg-white/10 text-white border border-white/20 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all text-lg input-glow">
-                                <button onclick="generateAIOptions()" class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all btn-glow font-semibold text-lg shadow-lg">🚀 Generate</button>
-                            </div>
+                                                     <div class="flex flex-col sm:flex-row gap-4">
+                             <input type="number" id="numOptions" value="4" min="2" max="10" class="flex-1 px-6 py-4 rounded-2xl bg-white/10 text-white border border-white/20 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all text-lg input-glow">
+                             <button onclick="generateAIOptions()" class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all btn-glow font-semibold text-lg shadow-lg">🚀 Generate</button>
+                         </div>
                             <div id="aiOptionsResult" class="mt-4 hidden"></div>
                         </div>
                     </div>
@@ -278,10 +343,10 @@
 
                 <div id="paragraphSection" class="mb-8 hidden">
                     <label class="block text-white font-semibold mb-4 text-lg">💡 AI Example Answers</label>
-                    <div class="flex space-x-4">
-                        <input type="number" id="numExamples" value="3" min="1" max="10" class="flex-1 px-6 py-4 rounded-2xl bg-white/10 text-white border border-white/20 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all text-lg input-glow">
-                        <button onclick="generateAIExamples()" class="px-8 py-4 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-2xl hover:from-green-600 hover:to-blue-600 transition-all btn-glow font-semibold text-lg shadow-lg">✨ Generate Examples</button>
-                    </div>
+                                             <div class="flex flex-col sm:flex-row gap-4">
+                             <input type="number" id="numExamples" value="3" min="1" max="10" class="flex-1 px-6 py-4 rounded-2xl bg-white/10 text-white border border-white/20 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all text-lg input-glow">
+                             <button onclick="generateAIExamples()" class="px-8 py-4 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-2xl hover:from-green-600 hover:to-blue-600 transition-all btn-glow font-semibold text-lg shadow-lg">✨ Generate Examples</button>
+                         </div>
                     <div id="aiExamplesResult" class="mt-4 hidden"></div>
                 </div>
 
@@ -289,10 +354,10 @@
                     <button onclick="generateFormWithAI()" class="w-full px-8 py-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white rounded-2xl hover:from-purple-600 hover:via-pink-600 hover:to-red-600 transition-all btn-glow font-bold text-xl shadow-2xl mb-6 btn-shimmer">🤖 Generate Form with AI</button>
                 </div>
                 
-                <div class="flex space-x-4">
-                    <button onclick="addQuestion()" class="flex-1 px-8 py-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all btn-glow font-bold text-lg shadow-lg">➕ Add Question</button>
-                    <button onclick="clearForm()" class="px-8 py-6 bg-white/20 text-white rounded-2xl hover:bg-white/30 transition-all font-bold text-lg shadow-lg">🗑️ Clear</button>
-                </div>
+                                 <div class="flex flex-col sm:flex-row gap-4">
+                     <button onclick="addQuestion()" class="flex-1 px-8 py-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all btn-glow font-bold text-lg shadow-lg">➕ Add Question</button>
+                     <button onclick="clearForm()" class="px-8 py-6 bg-white/20 text-white rounded-2xl hover:bg-white/30 transition-all font-bold text-lg shadow-lg">🗑️ Clear</button>
+                 </div>
             </div>
         </div>
 
@@ -389,6 +454,20 @@
                              </div>
                              <h3 class="text-white font-bold text-lg mb-2">Review & Create</h3>
                              <p class="text-white/80 text-sm">Review, edit if needed, and create instantly</p>
+                         </div>
+                     </div>
+                     
+                     <div class="bg-yellow-500/20 border border-yellow-500/30 rounded-2xl p-4 mb-6">
+                         <div class="flex items-start space-x-3">
+                             <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                 </svg>
+                             </div>
+                             <div>
+                                 <h4 class="text-yellow-300 font-semibold text-sm mb-1">💡 Pro Tip</h4>
+                                 <p class="text-yellow-200/90 text-sm">If you encounter any errors or bugs, simply try again without reloading the page. The AI will generate fresh content each time!</p>
+                             </div>
                          </div>
                      </div>
                      
@@ -860,6 +939,25 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
                  document.getElementById('welcomeModal').classList.remove('hidden');
                  document.getElementById('welcomeModal').classList.add('flex');
                  localStorage.setItem('formBuilderVisited', 'true');
+             }
+             
+             // Mobile optimizations
+             if (window.innerWidth <= 768) {
+                 // Reduce particle count on mobile for better performance
+                 const particles = document.querySelectorAll('.particle');
+                 particles.forEach((particle, index) => {
+                     if (index > 10) particle.remove();
+                 });
+                 
+                 // Add touch-friendly interactions
+                 document.querySelectorAll('button').forEach(button => {
+                     button.addEventListener('touchstart', function() {
+                         this.style.transform = 'scale(0.95)';
+                     });
+                     button.addEventListener('touchend', function() {
+                         this.style.transform = '';
+                     });
+                 });
              }
          });
     </script>
