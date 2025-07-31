@@ -1,0 +1,4 @@
+GEMINI_API_KEY=AIzaSyBWvOxGMQhotE9xibPay49Bm2SnTkrmd0U
+
+ GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby56SEBLDNZ6tuZGNNYdQKPVKEwAUf9nEoEeRFUuO_xnnHIP-axbNqWuID2EF0BAFqw_g/exec';
+        const GEMINI_API_KEY = 'AIzaSyBWvOxGMQhotE9xibPay49Bm2SnTkrmd0U';
