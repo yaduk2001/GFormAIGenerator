@@ -273,7 +273,7 @@
         </div>
 
         <div id="formContainer" class="flex justify-center">
-            <div class="w-full max-w-2xl">
+            <div class="w-full max-w-2xl" id="mainFormSection">
                 <div class="glass rounded-3xl p-8 card-hover transition-all duration-300 slide-in">
                 <div class="flex items-center mb-8">
                     <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4">
@@ -291,7 +291,15 @@
 
                 <div class="mb-8">
                     <label class="block text-white font-semibold mb-3 text-lg">❓ Question Text</label>
-                    <input type="text" id="questionText" placeholder="Enter your question..." class="w-full px-6 py-4 rounded-2xl bg-white/10 text-white placeholder-white/60 border border-white/20 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all input-glow text-lg">
+                    <div class="flex gap-4 mb-4">
+                        <input type="text" id="questionText" placeholder="Enter your question..." class="flex-1 px-6 py-4 rounded-2xl bg-white/10 text-white placeholder-white/60 border border-white/20 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all input-glow text-lg">
+                        <button onclick="showCSVImportModal()" class="px-6 py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-2xl hover:from-green-600 hover:to-teal-700 transition-all btn-glow font-semibold text-lg shadow-lg">📁 Import CSV</button>
+                    </div>
+                    <div id="csvImportPreview" class="hidden mt-4 p-4 bg-white/10 rounded-2xl border border-white/20">
+                        <h4 class="text-white font-semibold mb-2">📋 Imported Questions:</h4>
+                        <div id="importedQuestionsList" class="max-h-32 overflow-y-auto space-y-2"></div>
+                        <button onclick="importQuestionsFromCSV()" class="mt-4 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all btn-glow font-semibold">✅ Import All Questions</button>
+                    </div>
                 </div>
 
                 <div class="mb-8">
@@ -351,7 +359,7 @@
                 </div>
 
                 <div class="mb-8">
-                    <button onclick="generateFormWithAI()" class="w-full px-8 py-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white rounded-2xl hover:from-purple-600 hover:via-pink-600 hover:to-red-600 transition-all btn-glow font-bold text-xl shadow-2xl mb-6 btn-shimmer">🤖 Generate Form with AI</button>
+                    <button onclick="showAIGenerationModal()" class="w-full px-8 py-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white rounded-2xl hover:from-purple-600 hover:via-pink-600 hover:to-red-600 transition-all btn-glow font-bold text-xl shadow-2xl mb-6 btn-shimmer">🤖 Generate Form with AI</button>
                 </div>
                 
                                  <div class="flex flex-col sm:flex-row gap-4">
@@ -362,29 +370,32 @@
         </div>
 
         <div id="formPreviewSection" class="glass rounded-3xl p-8 card-hover transition-all duration-300 slide-in hidden">
-                <div class="flex items-center mb-8">
-                    <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl flex items-center justify-center mr-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            <div class="flex items-center mb-8">
+                <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-bold text-white">Questions List</h2>
+            </div>
+            
+            <div id="questionsPreview" class="space-y-4 mb-8">
+                <div class="text-white/70 text-center py-12">
+                    <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     </div>
-                    <h2 class="text-3xl font-bold text-white">Form Preview</h2>
+                    <p class="text-lg font-semibold">No questions added yet</p>
+                    <p class="text-sm opacity-75">Add your first question to see the list!</p>
                 </div>
-                <div id="questionsPreview" class="space-y-4 mb-8">
-                    <div class="text-white/70 text-center py-12">
-                        <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-8 h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                        </div>
-                        <p class="text-lg font-semibold">No questions added yet</p>
-                        <p class="text-sm opacity-75">Add your first question to see the preview!</p>
-                    </div>
-                </div>
-                
-                <div id="createFormSection" class="hidden">
-                    <button onclick="createGoogleForm()" id="createFormBtn" class="w-full px-8 py-6 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-2xl hover:from-green-600 hover:to-teal-700 transition-all btn-glow font-bold text-xl pulse-glow shadow-2xl">🚀 Create Google Form</button>
+            </div>
+            
+            <div id="createFormSection" class="hidden">
+                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                    <button onclick="showAIGenerationModal()" class="flex-1 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all btn-glow font-bold text-lg shadow-lg">🤖 Add More Questions</button>
+                    <button onclick="createGoogleForm()" id="createFormBtn" class="flex-1 px-6 py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-2xl hover:from-green-600 hover:to-teal-700 transition-all btn-glow font-bold text-lg pulse-glow shadow-2xl">🚀 Create Google Form</button>
                 </div>
             </div>
         </div>
@@ -478,6 +489,141 @@
                  </div>
              </div>
          </div>
+
+         <!-- AI Generation Modal -->
+         <div id="aiGenerationModal" class="fixed inset-0 bg-black/60 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+             <div class="glass-dark rounded-3xl p-6 sm:p-8 md:p-12 max-w-2xl w-full mx-auto max-h-[90vh] overflow-y-auto">
+                 <div class="text-center mb-6">
+                     <div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl">
+                         <svg class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                         </svg>
+                     </div>
+                     <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 text-glow">AI Form Generation</h2>
+                     <p class="text-base sm:text-lg md:text-xl text-white/90 mb-6">Customize your AI-generated form</p>
+                 </div>
+
+                 <!-- Step 1: Question Count -->
+                 <div id="step1" class="mb-6">
+                     <h3 class="text-white font-bold text-lg sm:text-xl mb-4">📊 How many questions do you need?</h3>
+                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                         <button onclick="selectQuestionCount(3)" class="question-count-btn px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all border border-white/20">3</button>
+                         <button onclick="selectQuestionCount(5)" class="question-count-btn px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all border border-white/20">5</button>
+                         <button onclick="selectQuestionCount(8)" class="question-count-btn px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all border border-white/20">8</button>
+                         <button onclick="selectQuestionCount(10)" class="question-count-btn px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all border border-white/20">10</button>
+                     </div>
+                     <div class="flex items-center gap-4">
+                         <label class="text-white font-medium">Custom:</label>
+                         <input type="number" id="customQuestionCount" min="1" max="20" value="5" class="flex-1 px-4 py-2 rounded-xl bg-white/10 text-white border border-white/20 focus:border-purple-400 focus:outline-none">
+                     </div>
+                 </div>
+
+                 <!-- Step 2: Question Types -->
+                 <div id="step2" class="mb-6 hidden">
+                     <h3 class="text-white font-bold text-lg sm:text-xl mb-4">📋 Select question types (you can choose multiple)</h3>
+                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                         <label class="flex items-center p-3 bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer">
+                             <input type="checkbox" id="shortAnswer" class="mr-3" checked>
+                             <span class="text-white font-medium">Short Answer</span>
+                         </label>
+                         <label class="flex items-center p-3 bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer">
+                             <input type="checkbox" id="paragraph" class="mr-3" checked>
+                             <span class="text-white font-medium">Paragraph</span>
+                         </label>
+                         <label class="flex items-center p-3 bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer">
+                             <input type="checkbox" id="multipleChoice" class="mr-3" checked>
+                             <span class="text-white font-medium">Multiple Choice</span>
+                         </label>
+                         <label class="flex items-center p-3 bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer">
+                             <input type="checkbox" id="checkboxes" class="mr-3" checked>
+                             <span class="text-white font-medium">Checkboxes</span>
+                         </label>
+                         <label class="flex items-center p-3 bg-white/10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer">
+                             <input type="checkbox" id="dropdown" class="mr-3" checked>
+                             <span class="text-white font-medium">Dropdown</span>
+                         </label>
+                     </div>
+                     <div class="bg-blue-500/20 border border-blue-500/30 rounded-xl p-3 mb-4">
+                         <p class="text-blue-200 text-sm">💡 You can select multiple types. AI will distribute questions across selected types.</p>
+                     </div>
+                 </div>
+
+                 <!-- Step 3: Generation Summary -->
+                 <div id="step3" class="mb-6 hidden">
+                     <h3 class="text-white font-bold text-lg sm:text-xl mb-4">🎯 Generation Summary</h3>
+                     <div class="bg-white/10 rounded-xl p-4 border border-white/20">
+                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                             <div>
+                                 <h4 class="text-white font-semibold mb-2">📊 Questions:</h4>
+                                 <p class="text-white/80">Total: <span id="summaryQuestionCount" class="font-bold">5</span></p>
+                                 <p class="text-white/80">Types: <span id="summaryQuestionTypes" class="font-bold">Short Answer, Paragraph, Multiple Choice, Checkboxes, Dropdown</span></p>
+                             </div>
+                             <div>
+                                 <h4 class="text-white font-semibold mb-2">🤖 AI Generation:</h4>
+                                 <p class="text-white/80">Form Title: <span id="summaryFormTitle" class="font-bold">Your Form Title</span></p>
+                                 <p class="text-white/80">Smart distribution across selected types</p>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Navigation Buttons -->
+                 <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                     <button onclick="closeAIGenerationModal()" class="px-6 sm:px-8 py-3 sm:py-4 bg-white/20 text-white rounded-2xl hover:bg-white/30 transition-all font-bold text-base sm:text-lg">❌ Cancel</button>
+                     <button onclick="previousStep()" id="prevBtn" class="px-6 sm:px-8 py-3 sm:py-4 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-all font-bold text-base sm:text-lg hidden">⬅️ Previous</button>
+                     <button onclick="nextStep()" id="nextBtn" class="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all btn-glow font-bold text-base sm:text-lg">Next ➡️</button>
+                     <button onclick="generateFormWithAI()" id="generateBtn" class="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-2xl hover:from-green-600 hover:to-blue-600 transition-all btn-glow font-bold text-base sm:text-lg hidden">🚀 Generate Form</button>
+                 </div>
+             </div>
+         </div>
+
+         <!-- CSV Import Modal -->
+         <div id="csvImportModal" class="fixed inset-0 bg-black/60 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+             <div class="glass-dark rounded-3xl p-6 sm:p-8 md:p-12 max-w-2xl w-full mx-auto max-h-[90vh] overflow-y-auto">
+                 <div class="text-center mb-6">
+                     <div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl">
+                         <svg class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                         </svg>
+                     </div>
+                     <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 text-glow">Import Questions from CSV</h2>
+                     <p class="text-base sm:text-lg md:text-xl text-white/90 mb-6">Upload a CSV file with your questions</p>
+                 </div>
+
+                 <div class="mb-6">
+                     <div class="border-2 border-dashed border-white/30 rounded-xl p-8 text-center hover:border-white/50 transition-all relative">
+                         <input type="file" id="csvImportFile" accept=".csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                         <div class="text-white/80 relative z-0">
+                             <svg class="w-16 h-16 mx-auto mb-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                             </svg>
+                             <p class="text-xl font-semibold">Drop your CSV file here</p>
+                             <p class="text-sm opacity-75 mb-2">or click to browse</p>
+                             <div class="bg-white/10 rounded-lg p-3 mt-4">
+                                 <p class="text-sm font-medium">📋 CSV Format:</p>
+                                 <p class="text-xs opacity-75">Column 1: Question text</p>
+                                 <p class="text-xs opacity-75">Column 2: Question type (optional)</p>
+                                 <p class="text-xs opacity-75">Column 3+: Options (optional, comma-separated)</p>
+                                 <p class="text-xs opacity-75">Example: "What is your favorite color?", "Multiple Choice", "Red, Blue, Green, Yellow"</p>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <div id="csvImportPreview" class="mb-6 hidden">
+                     <h3 class="text-white font-bold text-lg mb-4">📋 Preview:</h3>
+                     <div id="csvImportQuestionsList" class="bg-white/10 rounded-xl p-4 max-h-48 overflow-y-auto space-y-2"></div>
+                     <div class="mt-4 text-center">
+                         <p class="text-white/80 text-sm">Found <span id="csvQuestionCount" class="font-bold">0</span> questions</p>
+                     </div>
+                 </div>
+
+                 <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                     <button onclick="closeCSVImportModal()" class="px-6 sm:px-8 py-3 sm:py-4 bg-white/20 text-white rounded-2xl hover:bg-white/30 transition-all font-bold text-base sm:text-lg">❌ Cancel</button>
+                     <button onclick="processCSVImport()" id="processCSVBtn" class="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-2xl hover:from-green-600 hover:to-teal-700 transition-all btn-glow font-bold text-base sm:text-lg hidden">📥 Import Questions</button>
+                 </div>
+             </div>
+         </div>
     </div>
 
     <script>
@@ -489,6 +635,11 @@
 
         let questions = [];
         let currentOptionMethod = 'manual';
+        let aiGenerationStep = 1;
+        let selectedQuestionCount = 5;
+        let selectedQuestionTypes = ['Short Answer', 'Paragraph', 'Multiple Choice', 'Checkboxes', 'Dropdown'];
+        let csvQuestions = [];
+        let importedQuestions = [];
 
         document.getElementById('questionType').addEventListener('change', function() {
             const type = this.value;
@@ -633,9 +784,12 @@
                 const formContainer = document.getElementById('formContainer');
                 formContainer.className = 'grid grid-cols-1 lg:grid-cols-2 gap-8';
                 
-                // Show preview section
+                // Adjust main form section to be on the left
+                const mainFormSection = document.getElementById('mainFormSection');
+                mainFormSection.className = 'w-full';
+                
                 document.getElementById('formPreviewSection').classList.remove('hidden');
-                document.getElementById('formPreviewSection').classList.add('fade-in');
+                document.getElementById('createFormSection').classList.remove('hidden');
             }
             
             updatePreview();
@@ -648,12 +802,14 @@
             questions.splice(index, 1);
             updatePreview();
             if (questions.length === 0) {
-                document.getElementById('createFormSection').classList.add('hidden');
-                // Hide the preview section when no questions remain
                 document.getElementById('formPreviewSection').classList.add('hidden');
+                document.getElementById('createFormSection').classList.add('hidden');
                 // Return to centered layout
                 const formContainer = document.getElementById('formContainer');
                 formContainer.className = 'flex justify-center';
+                // Reset main form section
+                const mainFormSection = document.getElementById('mainFormSection');
+                mainFormSection.className = 'w-full max-w-2xl';
             }
         }
 
@@ -669,43 +825,46 @@
                             </svg>
                         </div>
                         <p class="text-lg font-semibold">No questions added yet</p>
-                        <p class="text-sm opacity-75">Add your first question to see the preview!</p>
+                        <p class="text-sm opacity-75">Add your first question to see the list!</p>
                     </div>
                 `;
                 return;
             }
 
-            preview.innerHTML = questions.map((q, i) => `
-                <div class="bg-white/10 rounded-2xl p-6 fade-in border border-white/10 hover:border-white/20 transition-all">
+            // Simple list of questions
+            const questionsHTML = questions.map((q, index) => `
+                <div class="bg-white/10 rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all mb-4">
                     <div class="flex justify-between items-start">
                         <div class="flex-1">
-                            <div class="flex items-center mb-3">
-                                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
-                                    <span class="text-white font-bold text-sm">${i + 1}</span>
+                            <div class="flex items-center mb-2">
+                                <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-white font-bold text-xs">${index + 1}</span>
                                 </div>
-                                <h4 class="text-white font-bold text-lg">${q.text}</h4>
+                                <h4 class="text-white font-semibold text-base">${q.text}</h4>
                             </div>
-                            <div class="flex items-center space-x-4 mb-3">
-                                <span class="px-3 py-1 bg-white/20 text-white rounded-full text-sm font-medium">${q.type}</span>
-                                ${q.options.length > 0 ? `<span class="text-white/60 text-sm">${q.options.length} options</span>` : ''}
+                            <div class="flex items-center space-x-3 mb-2">
+                                <span class="px-2 py-1 bg-white/20 text-white rounded-full text-xs font-medium">${q.type}</span>
+                                ${q.options.length > 0 ? `<span class="text-white/60 text-xs">${q.options.length} options</span>` : ''}
                             </div>
                             ${q.options.length > 0 ? `
-                                <div class="bg-white/5 rounded-xl p-4">
-                                    <p class="text-white/80 text-sm font-medium mb-2">Options:</p>
-                                    <div class="flex flex-wrap gap-2">
-                                        ${q.options.map(option => `<span class="px-2 py-1 bg-white/10 text-white rounded-lg text-sm">${option}</span>`).join('')}
+                                <div class="bg-white/5 rounded-lg p-3">
+                                    <p class="text-white/70 text-xs font-medium mb-2">Options:</p>
+                                    <div class="flex flex-wrap gap-1">
+                                        ${q.options.map(option => `<span class="px-2 py-1 bg-white/10 text-white rounded text-xs">${option}</span>`).join('')}
                                     </div>
                                 </div>
                             ` : ''}
                         </div>
-                        <button onclick="removeQuestion(${i})" class="text-red-400 hover:text-red-300 transition-colors ml-4 p-2 hover:bg-red-500/20 rounded-xl">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button onclick="removeQuestion(${index})" class="text-red-400 hover:text-red-300 transition-colors ml-2 p-1 hover:bg-red-500/20 rounded-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
                         </button>
                     </div>
                 </div>
             `).join('');
+
+            preview.innerHTML = questionsHTML;
         }
 
         function clearQuestionForm() {
@@ -719,17 +878,21 @@
             document.getElementById('paragraphSection').classList.add('hidden');
         }
 
+
+
         function clearForm() {
             clearQuestionForm();
             document.getElementById('formTitle').value = '';
             questions = [];
             updatePreview();
-            document.getElementById('createFormSection').classList.add('hidden');
-            // Hide the preview section when form is cleared
             document.getElementById('formPreviewSection').classList.add('hidden');
+            document.getElementById('createFormSection').classList.add('hidden');
             // Return to centered layout
             const formContainer = document.getElementById('formContainer');
             formContainer.className = 'flex justify-center';
+            // Reset main form section
+            const mainFormSection = document.getElementById('mainFormSection');
+            mainFormSection.className = 'w-full max-w-2xl';
         }
 
         // Fixed CORS issue by using GET request with parameters instead of POST
@@ -779,6 +942,302 @@
             }
         }
 
+        // AI Generation Modal Functions
+        function showAIGenerationModal() {
+            const formTitle = document.getElementById('formTitle').value.trim();
+            
+            if (!formTitle) {
+                alert('Please enter a form title first');
+                return;
+            }
+            
+            // Check if there are existing questions
+            const hasExistingQuestions = questions.length > 0;
+            
+            document.getElementById('aiGenerationModal').classList.remove('hidden');
+            document.getElementById('aiGenerationModal').classList.add('flex');
+            resetAIGenerationModal();
+            
+            // Update modal title and description if adding to existing questions
+            if (hasExistingQuestions) {
+                document.querySelector('#aiGenerationModal h2').textContent = 'Add More Questions';
+                document.querySelector('#aiGenerationModal p').textContent = `Add ${selectedQuestionCount} more questions to your existing ${questions.length} questions`;
+            } else {
+                document.querySelector('#aiGenerationModal h2').textContent = 'AI Form Generation';
+                document.querySelector('#aiGenerationModal p').textContent = 'Customize your AI-generated form';
+            }
+        }
+
+        function closeAIGenerationModal() {
+            document.getElementById('aiGenerationModal').classList.add('hidden');
+            document.getElementById('aiGenerationModal').classList.remove('flex');
+        }
+
+        function resetAIGenerationModal() {
+            aiGenerationStep = 1;
+            selectedQuestionCount = 5;
+            selectedQuestionTypes = ['Short Answer', 'Paragraph', 'Multiple Choice', 'Checkboxes', 'Dropdown'];
+            
+            // Reset UI
+            document.getElementById('customQuestionCount').value = '5';
+            document.querySelectorAll('.question-count-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-500', 'border-purple-400');
+                btn.classList.add('bg-white/10', 'border-white/20');
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+            
+            showStep(1);
+        }
+
+        function selectQuestionCount(count) {
+            selectedQuestionCount = count;
+            document.getElementById('customQuestionCount').value = count;
+            
+            // Update button styles
+            document.querySelectorAll('.question-count-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-500', 'border-purple-400');
+                btn.classList.add('bg-white/10', 'border-white/20');
+            });
+            event.target.classList.remove('bg-white/10', 'border-white/20');
+            event.target.classList.add('bg-purple-500', 'border-purple-400');
+        }
+
+        function nextStep() {
+            if (aiGenerationStep === 1) {
+                // Validate question count
+                const customCount = parseInt(document.getElementById('customQuestionCount').value);
+                if (customCount < 1 || customCount > 20) {
+                    alert('Please enter a valid number between 1 and 20');
+                    return;
+                }
+                selectedQuestionCount = customCount;
+                showStep(2);
+            } else if (aiGenerationStep === 2) {
+                // Validate question types
+                const checkedTypes = [];
+                if (document.getElementById('shortAnswer').checked) checkedTypes.push('Short Answer');
+                if (document.getElementById('paragraph').checked) checkedTypes.push('Paragraph');
+                if (document.getElementById('multipleChoice').checked) checkedTypes.push('Multiple Choice');
+                if (document.getElementById('checkboxes').checked) checkedTypes.push('Checkboxes');
+                if (document.getElementById('dropdown').checked) checkedTypes.push('Dropdown');
+                
+                if (checkedTypes.length === 0) {
+                    alert('Please select at least one question type');
+                    return;
+                }
+                selectedQuestionTypes = checkedTypes;
+                updateSummaryStep();
+                showStep(3);
+            }
+        }
+
+        function previousStep() {
+            if (aiGenerationStep > 1) {
+                showStep(aiGenerationStep - 1);
+            }
+        }
+
+        function showStep(step) {
+            aiGenerationStep = step;
+            
+            // Hide all steps
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            
+            // Show current step
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            
+            // Update navigation buttons
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            if (step === 1) {
+                prevBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+                generateBtn.classList.add('hidden');
+            } else if (step === 2) {
+                prevBtn.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+                generateBtn.classList.add('hidden');
+            } else if (step === 3) {
+                prevBtn.classList.remove('hidden');
+                nextBtn.classList.add('hidden');
+                generateBtn.classList.remove('hidden');
+            }
+        }
+
+        function updateSummaryStep() {
+            const formTitle = document.getElementById('formTitle').value.trim();
+            document.getElementById('summaryQuestionCount').textContent = selectedQuestionCount;
+            document.getElementById('summaryQuestionTypes').textContent = selectedQuestionTypes.join(', ');
+            document.getElementById('summaryFormTitle').textContent = formTitle || 'Your Form Title';
+        }
+
+        // CSV Questions Import (for options)
+        document.getElementById('csvQuestionsFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const csv = e.target.result;
+                    csvQuestions = parseCSVQuestions(csv);
+                    showCSVPreview();
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function parseCSVQuestions(csv) {
+            const lines = csv.trim().split('\n');
+            return lines.map(line => {
+                const columns = line.split(',').map(col => col.trim().replace(/^["']|["']$/g, ''));
+                
+                if (columns.length === 0 || !columns[0]) return null;
+                
+                const question = {
+                    text: columns[0],
+                    type: columns[1] || 'Short Answer',
+                    options: []
+                };
+                
+                // Parse options from remaining columns
+                if (columns.length > 2) {
+                    const optionsString = columns.slice(2).join(',');
+                    question.options = optionsString.split(',').map(opt => opt.trim()).filter(opt => opt);
+                }
+                
+                return question;
+            }).filter(question => question);
+        }
+
+        function showCSVPreview() {
+            const preview = document.getElementById('csvPreview');
+            const list = document.getElementById('csvQuestionsList');
+            
+            if (csvQuestions.length > 0) {
+                list.innerHTML = csvQuestions.map((q, i) => 
+                    `<div class="text-white/90 text-sm mb-1">${i + 1}. ${q}</div>`
+                ).join('');
+                preview.classList.remove('hidden');
+            } else {
+                preview.classList.add('hidden');
+            }
+        }
+
+        // CSV Import Functions
+        function showCSVImportModal() {
+            document.getElementById('csvImportModal').classList.remove('hidden');
+            document.getElementById('csvImportModal').classList.add('flex');
+            resetCSVImportModal();
+        }
+
+        function closeCSVImportModal() {
+            document.getElementById('csvImportModal').classList.add('hidden');
+            document.getElementById('csvImportModal').classList.remove('flex');
+        }
+
+        function resetCSVImportModal() {
+            importedQuestions = [];
+            document.getElementById('csvImportFile').value = '';
+            document.getElementById('csvImportPreview').classList.add('hidden');
+            document.getElementById('processCSVBtn').classList.add('hidden');
+        }
+
+        // CSV Import File Handler
+        document.getElementById('csvImportFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const csv = e.target.result;
+                    importedQuestions = parseCSVQuestions(csv);
+                    showCSVImportPreview();
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Prevent file input from interfering with modal buttons
+        document.getElementById('csvImportModal').addEventListener('click', function(e) {
+            // If clicking on buttons or outside the file upload area, don't trigger file input
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                e.stopPropagation();
+                return;
+            }
+        });
+
+        function showCSVImportPreview() {
+            const preview = document.getElementById('csvImportPreview');
+            const list = document.getElementById('csvImportQuestionsList');
+            const count = document.getElementById('csvQuestionCount');
+            
+            if (importedQuestions.length > 0) {
+                list.innerHTML = importedQuestions.map((q, i) => {
+                    const optionsText = q.options && q.options.length > 0 ? ` (${q.options.length} options)` : '';
+                    return `<div class="text-white/90 text-sm p-2 bg-white/5 rounded-lg">
+                        <div class="font-semibold">${i + 1}. ${q.text}</div>
+                        <div class="text-xs opacity-75">Type: ${q.type}${optionsText}</div>
+                        ${q.options && q.options.length > 0 ? `<div class="text-xs opacity-60 mt-1">Options: ${q.options.join(', ')}</div>` : ''}
+                    </div>`;
+                }).join('');
+                count.textContent = importedQuestions.length;
+                preview.classList.remove('hidden');
+                document.getElementById('processCSVBtn').classList.remove('hidden');
+            } else {
+                preview.classList.add('hidden');
+                document.getElementById('processCSVBtn').classList.add('hidden');
+            }
+        }
+
+        function processCSVImport() {
+            if (importedQuestions.length === 0) {
+                alert('No questions to import');
+                return;
+            }
+
+            // Add all imported questions with their types and options
+            importedQuestions.forEach(question => {
+                questions.push({
+                    text: question.text,
+                    type: question.type,
+                    options: question.options || []
+                });
+            });
+
+            // Show the preview section when questions are imported
+            // Change layout to side-by-side
+            const formContainer = document.getElementById('formContainer');
+            formContainer.className = 'grid grid-cols-1 lg:grid-cols-2 gap-8';
+            
+            // Adjust main form section to be on the left
+            const mainFormSection = document.getElementById('mainFormSection');
+            mainFormSection.className = 'w-full';
+            
+            document.getElementById('formPreviewSection').classList.remove('hidden');
+            document.getElementById('createFormSection').classList.remove('hidden');
+            
+            updatePreview();
+            document.getElementById('createFormSection').classList.remove('hidden');
+            
+            // Show success message
+            alert(`Successfully imported ${importedQuestions.length} questions!`);
+            
+            // Close modal
+            closeCSVImportModal();
+        }
+
+        function importQuestionsFromCSV() {
+            // This function is called from the inline preview
+            if (importedQuestions.length === 0) {
+                alert('No questions to import');
+                return;
+            }
+
+            processCSVImport();
+        }
+
         async function generateFormWithAI() {
             const formTitle = document.getElementById('formTitle').value.trim();
             
@@ -787,23 +1246,17 @@
                 return;
             }
 
-            // Show loading state
-            const button = event.target;
-            const originalText = button.innerHTML;
-            button.innerHTML = '🤖 Generating...';
-            button.disabled = true;
+            // Close modal and show loading
+            closeAIGenerationModal();
+            document.getElementById('loadingModal').classList.remove('hidden');
+            document.getElementById('loadingModal').classList.add('flex');
 
             try {
-                const prompt = `Generate a complete Google Form for: "${formTitle}"
-
-Create 5-8 relevant questions with appropriate types. Include:
-- 1-2 short answer questions
-- 1-2 paragraph questions  
-- 2-3 multiple choice questions with realistic options
-- 1-2 checkbox questions with relevant options
-- 1 dropdown question with appropriate choices
-
-IMPORTANT: Return ONLY valid JSON in this exact format, no additional text:
+                // Build prompt based on user selections
+                let prompt = `Generate a Google Form for: "${formTitle}"\n\n`;
+                prompt += `Create exactly ${selectedQuestionCount} questions with the following types: ${selectedQuestionTypes.join(', ')}\n\n`;
+                prompt += `Distribute the questions evenly across the selected types. For choice-based questions (Multiple Choice, Checkboxes, Dropdown), include 3-5 realistic options.\n\n`;
+                prompt += `IMPORTANT: Return ONLY valid JSON in this exact format, no additional text:
 {
   "title": "Form Title",
   "questions": [
@@ -813,8 +1266,8 @@ IMPORTANT: Return ONLY valid JSON in this exact format, no additional text:
       "options": []
     },
     {
-      "text": "Question text here",
-      "type": "Multiple Choice", 
+      "text": "Question text here", 
+      "type": "Multiple Choice",
       "options": ["Option 1", "Option 2", "Option 3"]
     }
   ]
@@ -845,10 +1298,9 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
                 
                 try {
                     if (formData.title && formData.questions && Array.isArray(formData.questions)) {
-                        // Clear existing questions
-                        questions = [];
+                        const existingQuestionsCount = questions.length;
                         
-                        // Add the AI-generated questions
+                        // Add the AI-generated questions (don't clear existing ones)
                         formData.questions.forEach(q => {
                             if (q.text && q.type) {
                                 questions.push({
@@ -859,8 +1311,8 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
                             }
                         });
                         
-                        // Update form title if provided
-                        if (formData.title) {
+                        // Update form title if provided and no existing title
+                        if (formData.title && !document.getElementById('formTitle').value.trim()) {
                             document.getElementById('formTitle').value = formData.title;
                         }
                         
@@ -869,13 +1321,22 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
                         const formContainer = document.getElementById('formContainer');
                         formContainer.className = 'grid grid-cols-1 lg:grid-cols-2 gap-8';
                         
+                        // Adjust main form section to be on the left
+                        const mainFormSection = document.getElementById('mainFormSection');
+                        mainFormSection.className = 'w-full';
+                        
                         document.getElementById('formPreviewSection').classList.remove('hidden');
-                        document.getElementById('formPreviewSection').classList.add('fade-in');
+                        document.getElementById('createFormSection').classList.remove('hidden');
                         
                         updatePreview();
                         document.getElementById('createFormSection').classList.remove('hidden');
                         
-                        alert(`Successfully generated ${questions.length} questions with AI!`);
+                        const newQuestionsCount = questions.length - existingQuestionsCount;
+                        if (existingQuestionsCount > 0) {
+                            alert(`Successfully added ${newQuestionsCount} more questions! Total: ${questions.length} questions`);
+                        } else {
+                            alert(`Successfully generated ${questions.length} questions with AI!`);
+                        }
                     } else {
                         throw new Error('Invalid response format');
                     }
@@ -889,9 +1350,9 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
                 console.error('AI Form Generation Error:', error);
                 alert('Failed to generate form with AI: ' + error.message);
             } finally {
-                // Reset button
-                button.innerHTML = originalText;
-                button.disabled = false;
+                // Hide loading modal
+                document.getElementById('loadingModal').classList.add('hidden');
+                document.getElementById('loadingModal').classList.remove('flex');
             }
         }
 
