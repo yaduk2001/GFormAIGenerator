@@ -365,9 +365,9 @@
                         </div>
                         
                         <div id="csvOptions" class="hidden">
-                            <div class="border-2 border-dashed border-white/30 rounded-2xl p-8 text-center hover:border-white/50 transition-all">
-                                <input type="file" id="csvFile" accept=".csv" class="w-full h-full absolute inset-0 opacity-0 cursor-pointer">
-                                <div class="text-white/80">
+                            <div class="border-2 border-dashed border-white/30 rounded-2xl p-8 text-center hover:border-white/50 transition-all relative">
+                                <input type="file" id="csvFile" accept=".csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" style="pointer-events: auto;">
+                                <div class="text-white/80 relative z-0" style="pointer-events: none;">
                                     <svg class="w-12 h-12 mx-auto mb-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                                     </svg>
@@ -597,6 +597,19 @@
                              <i class="fas fa-info-circle text-blue-400 mr-3"></i>
                              <span class="text-white/90">Total: <span id="totalPercent">100%</span></span>
                          </div>
+                     </div>
+                     
+                     <div>
+                         <label class="block text-white font-semibold mb-3">Question Type Filter</label>
+                         <select id="questionTypeFilter" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-blue-400">
+                             <option value="">All Question Types</option>
+                             <option value="Short Answer">Short Answer Only</option>
+                             <option value="Paragraph">Paragraph Only</option>
+                             <option value="Multiple Choice">Multiple Choice Only</option>
+                             <option value="Checkboxes">Checkboxes Only</option>
+                             <option value="Dropdown">Dropdown Only</option>
+                         </select>
+                         <p class="text-white/60 text-sm mt-1">Select to generate responses for specific question types only</p>
                      </div>
                  </div>
                  
@@ -935,6 +948,8 @@
             }
         });
 
+
+
         function setOptionMethod(method) {
             currentOptionMethod = method;
             document.getElementById('manualBtn').className = method === 'manual' ? 'flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all btn-glow' : 'flex-1 px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-all';
@@ -1245,12 +1260,18 @@
             // Clear any AI generation flags
             window.aiSemanticResponseCount = null;
             window.isAIGenerationMode = false;
+            // Clear selected question types
+            if (window.selectedQuestionTypes) {
+                window.selectedQuestionTypes = null;
+            }
         }
 
         function resetAIGenerationModal() {
             aiGenerationStep = 1;
             selectedQuestionCount = 5;
             selectedQuestionTypes = ['Short Answer', 'Paragraph', 'Multiple Choice', 'Checkboxes', 'Dropdown'];
+            // Store globally for use in response generation
+            window.selectedQuestionTypes = selectedQuestionTypes;
             
             // Reset UI
             document.getElementById('customQuestionCount').value = '5';
@@ -1300,6 +1321,8 @@
                     return;
                 }
                 selectedQuestionTypes = checkedTypes;
+                // Store globally for use in response generation
+                window.selectedQuestionTypes = checkedTypes;
                 showStep(3);
             } else if (aiGenerationStep === 3) {
                 // Validate Semantic responses if enabled
@@ -2001,11 +2024,21 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
             document.getElementById('aiTotalPercent').textContent = total + '%';
         }
 
-        // Testresponses with sentiment
+        // Testv5responses with sentiment
         function generateResponsesWithSentiment() {
             const positive = parseInt(document.getElementById('positivePercent').value);
             const neutral = parseInt(document.getElementById('neutralPercent').value);
             const negative = parseInt(document.getElementById('negativePercent').value);
+            
+            // Use the question types selected during AI generation, or fall back to dropdown
+            let questionTypeFilter = '';
+            if (window.selectedQuestionTypes && window.selectedQuestionTypes.length > 0) {
+                // If specific question types were selected during AI generation, use those
+                questionTypeFilter = window.selectedQuestionTypes;
+            } else {
+                // Fall back to dropdown selection for standalone generation
+                questionTypeFilter = document.getElementById('questionTypeFilter').value;
+            }
             
             if (positive + neutral + negative !== 100) {
                 Swal.fire('Invalid Configuration', 'Sentiment percentages must total 100%.', 'error');
@@ -2014,7 +2047,11 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
 
             // Check if this is from AI generation or standalone
             const numResponses = window.aiSemanticResponseCount || 5;
-            const responses = generateResponsesLocally(questions, numResponses, { positive, neutral, negative });
+            const responses = generateResponsesLocally(questions, numResponses, { positive, neutral, negative }, questionTypeFilter);
+            
+            if (responses.length === 0) {
+                return; // Error already shown by generateResponsesLocally
+            }
             
             hideSentimentModal();
             showResponsesResults(responses);
@@ -2029,16 +2066,38 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
         }
 
         // Generate responses locally
-        function generateResponsesLocally(formQuestions, numResponses, sentimentConfig) {
+        function generateResponsesLocally(formQuestions, numResponses, sentimentConfig, questionTypeFilter = null) {
             const responses = [];
             const { positive, neutral, negative } = sentimentConfig;
+            
+            // Filter questions by type if specified
+            let filteredQuestions;
+            if (questionTypeFilter) {
+                if (Array.isArray(questionTypeFilter)) {
+                    // If it's an array of question types (from AI generation)
+                    filteredQuestions = formQuestions.filter(q => questionTypeFilter.includes(q.type));
+                } else {
+                    // If it's a single question type (from dropdown)
+                    filteredQuestions = formQuestions.filter(q => q.type === questionTypeFilter);
+                }
+            } else {
+                filteredQuestions = formQuestions;
+            }
+            
+            if (filteredQuestions.length === 0) {
+                const filterText = Array.isArray(questionTypeFilter) ? questionTypeFilter.join(', ') : questionTypeFilter;
+                Swal.fire('No Questions Found', `No questions of type "${filterText}" found in your form.`, 'warning');
+                return [];
+            }
             
             for (let i = 0; i < numResponses; i++) {
                 const response = {};
                 const sentiment = getRandomSentiment(positive, neutral, negative);
                 
-                formQuestions.forEach((question, index) => {
-                    response[`Question ${index + 1}`] = generateLocalResponse(question, sentiment);
+                // Only generate responses for filtered questions
+                filteredQuestions.forEach((question, index) => {
+                    const originalIndex = formQuestions.indexOf(question);
+                    response[`Question ${originalIndex + 1}`] = generateLocalResponse(question, sentiment);
                 });
                 
                 responses.push(response);
@@ -2057,16 +2116,61 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
 
         // Generate local response
         function generateLocalResponse(question, sentiment) {
-            const { type, options } = question;
+            const { type, options, text } = question;
             
             switch (type) {
                 case 'Short Answer':
+                    // Generate 1-2 lines for short answers
+                    const shortAnswers = {
+                        positive: [
+                            'Excellent experience overall!',
+                            'Very satisfied with the service.',
+                            'Great quality and fast delivery.',
+                            'Highly recommend this product.',
+                            'Outstanding customer service.'
+                        ],
+                        neutral: [
+                            'It was okay, nothing special.',
+                            'Average experience, meets expectations.',
+                            'Decent quality for the price.',
+                            'Satisfactory service delivery.',
+                            'Standard experience as expected.'
+                        ],
+                        negative: [
+                            'Poor quality, very disappointed.',
+                            'Not worth the money spent.',
+                            'Terrible customer service experience.',
+                            'Would not recommend to others.',
+                            'Below average performance.'
+                        ]
+                    };
+                    return shortAnswers[sentiment][Math.floor(Math.random() * shortAnswers[sentiment].length)];
+                    
                 case 'Paragraph':
-                    return sentiment === 'positive' ? 'Great experience' : sentiment === 'negative' ? 'Poor quality' : 'Okay service';
+                    // Generate at least 5 lines for paragraph answers
+                    const paragraphAnswers = {
+                        positive: [
+                            'I had an absolutely wonderful experience with this service. The quality exceeded my expectations in every way possible. The staff was incredibly professional and attentive to all my needs. The turnaround time was much faster than I anticipated, and the final result was simply outstanding. I would definitely recommend this to anyone looking for similar services. The attention to detail was remarkable, and I felt valued as a customer throughout the entire process.',
+                            'This has been one of the best experiences I\'ve had in a long time. The level of professionalism displayed by the team was exceptional. Every aspect of the service was handled with care and precision. The communication was clear and timely, making the entire process smooth and enjoyable. I was particularly impressed by how they went above and beyond to ensure my satisfaction. The results speak for themselves - absolutely fantastic work that I\'m very happy with.',
+                            'I cannot express enough how satisfied I am with this experience. The service quality was top-notch from start to finish. The team demonstrated excellent expertise and knowledge in their field. What really stood out was their commitment to customer satisfaction and attention to detail. The process was seamless and the outcome exceeded all my expectations. I would highly recommend this service to anyone who values quality and professionalism.'
+                        ],
+                        neutral: [
+                            'My experience was generally satisfactory and met most of my expectations. The service was delivered within the promised timeframe, though not particularly exceptional. The quality was acceptable for the price point, though there were some areas that could have been better. The staff was polite and professional, though not overly enthusiastic. Overall, it was a decent experience that I would consider again if needed, but I wouldn\'t go out of my way to recommend it.',
+                            'The service was adequate and fulfilled the basic requirements I had. There were both positive and negative aspects to consider. On the positive side, the delivery was on time and the staff was reasonably helpful. However, there were some minor issues with quality that could have been addressed better. The experience was neither particularly memorable nor disappointing - it was simply functional. I would use this service again if the price was right.',
+                            'This was a fairly standard experience that didn\'t particularly stand out in any way. The service was delivered as promised, though not with any extra effort or attention to detail. The quality was acceptable but not exceptional, and the staff was professional but not overly engaging. The process was straightforward and completed without major issues. While I wouldn\'t hesitate to use this service again, I also wouldn\'t go out of my way to recommend it to others.'
+                        ],
+                        negative: [
+                            'I was extremely disappointed with the overall experience and quality of service provided. The staff seemed disinterested and unprofessional throughout the entire process. There were numerous delays and communication issues that made the experience frustrating. The final result was far below my expectations and the quality was subpar for the price paid. I would not recommend this service to anyone and would actively discourage others from using it. The lack of attention to detail was concerning.',
+                            'This was one of the worst experiences I\'ve had with a service provider. The quality was poor and the customer service was even worse. There were multiple issues that were not addressed properly, and the staff was unhelpful when I tried to resolve problems. The delivery was late and the final product was not what was promised. I felt like my concerns were completely ignored throughout the process. I would never use this service again.',
+                            'I am very dissatisfied with the service I received. The quality was below average and the staff was unprofessional and unresponsive to my needs. There were several problems that were not resolved satisfactorily, and the overall experience was frustrating and disappointing. The final result did not meet my expectations at all, and I felt like my time and money were wasted. I would not recommend this service to anyone.'
+                        ]
+                    };
+                    return paragraphAnswers[sentiment][Math.floor(Math.random() * paragraphAnswers[sentiment].length)];
+                    
                 case 'Multiple Choice':
                 case 'Dropdown':
                 case 'Checkboxes':
-                    return options && options.length > 0 ? options[0] : 'Option 1';
+                    return options && options.length > 0 ? options[Math.floor(Math.random() * options.length)] : 'Option 1';
                 default:
                     return 'Response';
             }
@@ -2109,6 +2213,19 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
                 return '<p class="text-white/60 text-center py-4">No responses to preview</p>';
             }
 
+            // Get the question type filter to show only relevant questions
+            let filteredQuestions;
+            if (window.selectedQuestionTypes && window.selectedQuestionTypes.length > 0) {
+                // Use question types selected during AI generation
+                filteredQuestions = questions.filter(q => window.selectedQuestionTypes.includes(q.type));
+            } else {
+                // Fall back to dropdown selection
+                const questionTypeFilter = document.getElementById('questionTypeFilter')?.value || '';
+                filteredQuestions = questionTypeFilter 
+                    ? questions.filter(q => q.type === questionTypeFilter)
+                    : questions;
+            }
+
             let tableHTML = `
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
@@ -2117,9 +2234,11 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
                                 <th class="text-left text-white font-semibold p-2">Response #</th>
             `;
             
-            // Add question headers
-            questions.forEach((question, index) => {
-                tableHTML += `<th class="text-left text-white font-semibold p-2">Q${index + 1}: ${question.text.substring(0, 30)}${question.text.length > 30 ? '...' : ''}</th>`;
+            // Add question headers with type and text (only filtered questions)
+            filteredQuestions.forEach((question, index) => {
+                const questionText = question.text.length > 25 ? question.text.substring(0, 25) + '...' : question.text;
+                const questionType = question.type || 'Text';
+                tableHTML += `<th class="text-left text-white font-semibold p-2">${questionType}: ${questionText}</th>`;
             });
             
             tableHTML += '</tr></thead><tbody>';
@@ -2129,9 +2248,10 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
                 tableHTML += `<tr class="border-b border-white/10">`;
                 tableHTML += `<td class="text-white/80 font-medium p-2">${responseIndex + 1}</td>`;
                 
-                questions.forEach((question, questionIndex) => {
+                filteredQuestions.forEach((question, questionIndex) => {
                     // The response data uses "Question X" format as keys
-                    const questionKey = `Question ${questionIndex + 1}`;
+                    const originalIndex = questions.indexOf(question);
+                    const questionKey = `Question ${originalIndex + 1}`;
                     const answer = response[questionKey] || 'No response';
                     
                     tableHTML += `<td class="text-white/70 p-2">${answer}</td>`;
@@ -2154,13 +2274,35 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
         // Download responses as CSV
         function downloadResponsesCSV(responses) {
             const formTitle = document.getElementById('formTitle').value.trim() || 'AI-Generated Form';
-            const headers = ['Response #', ...questions.map((q, i) => `Question ${i + 1}: ${q.text}`)];
+            
+            // Get the question type filter to include only relevant questions
+            let filteredQuestions;
+            if (window.selectedQuestionTypes && window.selectedQuestionTypes.length > 0) {
+                // Use question types selected during AI generation
+                filteredQuestions = questions.filter(q => window.selectedQuestionTypes.includes(q.type));
+            } else {
+                // Fall back to dropdown selection
+                const questionTypeFilter = document.getElementById('questionTypeFilter')?.value || '';
+                filteredQuestions = questionTypeFilter 
+                    ? questions.filter(q => q.type === questionTypeFilter)
+                    : questions;
+            }
+            
+            // Create descriptive headers with question text and type
+            const headers = ['Response #'];
+            filteredQuestions.forEach((q, i) => {
+                const questionText = q.text.length > 50 ? q.text.substring(0, 50) + '...' : q.text;
+                const questionType = q.type || 'Text';
+                headers.push(`${questionType} - ${questionText}`);
+            });
+            
             const csvContent = [
                 headers.join(','),
                 ...responses.map((response, index) => {
                     const row = [index + 1];
-                    questions.forEach((_, i) => {
-                        const answer = response[`Question ${i + 1}`] || '';
+                    filteredQuestions.forEach((q, i) => {
+                        const originalIndex = questions.indexOf(q);
+                        const answer = response[`Question ${originalIndex + 1}`] || '';
                         row.push(`"${answer.replace(/"/g, '""')}"`);
                     });
                     return row.join(',');
@@ -2171,7 +2313,7 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${formTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_Semantic_responses.csv`;
+            a.download = `${formTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_synthetic_responses.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
         }
@@ -2179,19 +2321,71 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
         // Download responses as JSON
         function downloadResponsesJSON(responses) {
             const formTitle = document.getElementById('formTitle').value.trim() || 'AI-Generated Form';
+            
+            // Get the question type filter to include only relevant questions
+            let filteredQuestions;
+            let questionTypeFilterText;
+            if (window.selectedQuestionTypes && window.selectedQuestionTypes.length > 0) {
+                // Use question types selected during AI generation
+                filteredQuestions = questions.filter(q => window.selectedQuestionTypes.includes(q.type));
+                questionTypeFilterText = window.selectedQuestionTypes.join(', ');
+            } else {
+                // Fall back to dropdown selection
+                const questionTypeFilter = document.getElementById('questionTypeFilter')?.value || '';
+                filteredQuestions = questionTypeFilter 
+                    ? questions.filter(q => q.type === questionTypeFilter)
+                    : questions;
+                questionTypeFilterText = questionTypeFilter || "All Question Types";
+            }
+            
+            // Create responses with descriptive field names
+            const descriptiveResponses = responses.map((response, responseIndex) => {
+                const descriptiveResponse = {
+                    responseNumber: responseIndex + 1,
+                    timestamp: new Date().toISOString()
+                };
+                
+                filteredQuestions.forEach((question, questionIndex) => {
+                    const originalIndex = questions.indexOf(question);
+                    const questionKey = `Question ${originalIndex + 1}`;
+                    const answer = response[questionKey] || '';
+                    
+                    // Create descriptive field name
+                    const questionText = question.text.length > 50 ? question.text.substring(0, 50) + '...' : question.text;
+                    const questionType = question.type || 'Text';
+                    const fieldName = `${questionType}_${questionText.replace(/[^a-z0-9]/gi, '_')}`;
+                    
+                    descriptiveResponse[fieldName] = answer;
+                });
+                
+                return descriptiveResponse;
+            });
+            
             const data = {
                 formTitle: formTitle,
-                questions: questions,
-                responses: responses,
+                formDescription: "AI-Generated Form with Synthetic Responses",
+                questions: filteredQuestions.map((q, i) => ({
+                    questionNumber: i + 1,
+                    questionType: q.type || 'Text',
+                    questionText: q.text,
+                    options: q.options || []
+                })),
+                responses: descriptiveResponses,
                 generatedAt: new Date().toISOString(),
-                totalResponses: responses.length
+                totalResponses: responses.length,
+                metadata: {
+                    generationMethod: "Synthetic Response Generation",
+                    sentimentDistribution: "Customized based on user settings",
+                    dataFormat: "Structured JSON with descriptive field names",
+                    questionTypeFilter: questionTypeFilterText
+                }
             };
 
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${formTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_Semantic_responses.json`;
+            a.download = `${formTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_synthetic_responses.json`;
             a.click();
             window.URL.revokeObjectURL(url);
         }
